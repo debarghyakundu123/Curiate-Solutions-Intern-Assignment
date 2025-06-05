@@ -263,71 +263,71 @@ if analyze_button:
             enhanced_analysis = analyze_text(updated_text)
 
 
-            # --- BEFORE vs AFTER SEO COMPARISON SECTION ---
-    st.markdown("---")
-    st.markdown("## 🚦 Before vs After SEO Comparison")
+                # --- BEFORE vs AFTER SEO COMPARISON SECTION ---
+        st.markdown("---")
+        st.markdown("## 🚦 Before vs After SEO Comparison")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### 📝 Original Text")
+            st.markdown(f'<div class="card">{user_text}</div>', unsafe_allow_html=True)
+            st.markdown("#### Entities")
+            ent_before = [e['id'] for e in original_analysis['entities']]
+            st.write(ent_before if ent_before else "None detected")
+            st.markdown("#### Topics")
+            top_before = [t['label'] for t in original_analysis['topics']]
+            st.write(top_before if top_before else "None detected")
+            st.markdown("#### Categories")
+            cat_before = [c['label'] for c in original_analysis['categories']]
+            st.write(cat_before if cat_before else "None detected")
+            st.markdown("#### SEO Keywords")
+            kw_before = [k['keyword'] for k in original_analysis['seo_keywords']]
+            st.write(kw_before if kw_before else "None detected")
+        
+        with col2:
+            st.markdown("### 📝 Enhanced Text")
+            st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
+            st.markdown("#### Entities")
+            ent_after = [e['id'] for e in enhanced_analysis['entities']]
+            st.write(ent_after if ent_after else "None detected")
+            st.markdown("#### Topics")
+            top_after = [t['label'] for t in enhanced_analysis['topics']]
+            st.write(top_after if top_after else "None detected")
+            st.markdown("#### Categories")
+            cat_after = [c['label'] for c in enhanced_analysis['categories']]
+            st.write(cat_after if cat_after else "None detected")
+            st.markdown("#### SEO Keywords")
+            kw_after = [k['keyword'] for k in enhanced_analysis['seo_keywords']]
+            st.write(kw_after if kw_after else "None detected")
+        
+        # Show a summary table for quick comparison
+        st.markdown("### 📋 Quick Comparison Table")
+        comp_data = {
+            "Original": [
+                len(ent_before), len(top_before), len(cat_before), len(kw_before)
+            ],
+            "Enhanced": [
+                len(ent_after), len(top_after), len(cat_after), len(kw_after)
+            ]
+        }
+        comp_df = pd.DataFrame(comp_data, index=["Entities", "Topics", "Categories", "SEO Keywords"])
+        st.table(comp_df)
+        
+        # Show Altair bar charts for visual diff (Entities as example)
+        st.markdown("### 📊 Entities Relevance: Before vs After")
+        entities_df = compare_items(
+            original_analysis["entities"],
+            enhanced_analysis["entities"],
+            key='id', score='relevance'
+        )
+        chart = grouped_bar_chart(entities_df, "Entities by Relevance", item_col='Item')
+        if chart:
+            st.altair_chart(chart, use_container_width=True)
+        else:
+            st.info("No entity comparison data available.")
+        
+        # You can repeat the above for topics, categories, and keywords if you want more charts!
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### 📝 Original Text")
-        st.markdown(f'<div class="card">{user_text}</div>', unsafe_allow_html=True)
-        st.markdown("#### Entities")
-        ent_before = [e['id'] for e in original_analysis['entities']]
-        st.write(ent_before if ent_before else "None detected")
-        st.markdown("#### Topics")
-        top_before = [t['label'] for t in original_analysis['topics']]
-        st.write(top_before if top_before else "None detected")
-        st.markdown("#### Categories")
-        cat_before = [c['label'] for c in original_analysis['categories']]
-        st.write(cat_before if cat_before else "None detected")
-        st.markdown("#### SEO Keywords")
-        kw_before = [k['keyword'] for k in original_analysis['seo_keywords']]
-        st.write(kw_before if kw_before else "None detected")
-    
-    with col2:
-        st.markdown("### 📝 Enhanced Text")
-        st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
-        st.markdown("#### Entities")
-        ent_after = [e['id'] for e in enhanced_analysis['entities']]
-        st.write(ent_after if ent_after else "None detected")
-        st.markdown("#### Topics")
-        top_after = [t['label'] for t in enhanced_analysis['topics']]
-        st.write(top_after if top_after else "None detected")
-        st.markdown("#### Categories")
-        cat_after = [c['label'] for c in enhanced_analysis['categories']]
-        st.write(cat_after if cat_after else "None detected")
-        st.markdown("#### SEO Keywords")
-        kw_after = [k['keyword'] for k in enhanced_analysis['seo_keywords']]
-        st.write(kw_after if kw_after else "None detected")
-    
-    # Show a summary table for quick comparison
-    st.markdown("### 📋 Quick Comparison Table")
-    comp_data = {
-        "Original": [
-            len(ent_before), len(top_before), len(cat_before), len(kw_before)
-        ],
-        "Enhanced": [
-            len(ent_after), len(top_after), len(cat_after), len(kw_after)
-        ]
-    }
-    comp_df = pd.DataFrame(comp_data, index=["Entities", "Topics", "Categories", "SEO Keywords"])
-    st.table(comp_df)
-    
-    # Show Altair bar charts for visual diff (Entities as example)
-    st.markdown("### 📊 Entities Relevance: Before vs After")
-    entities_df = compare_items(
-        original_analysis["entities"],
-        enhanced_analysis["entities"],
-        key='id', score='relevance'
-    )
-    chart = grouped_bar_chart(entities_df, "Entities by Relevance", item_col='Item')
-    if chart:
-        st.altair_chart(chart, use_container_width=True)
-    else:
-        st.info("No entity comparison data available.")
-    
-    # You can repeat the above for topics, categories, and keywords if you want more charts!
-
 
         st.markdown("---")
         st.markdown("## 📊 SEO Comparison: Original vs Enhanced")
