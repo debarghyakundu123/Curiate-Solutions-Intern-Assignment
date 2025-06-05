@@ -320,12 +320,15 @@ if analyze_button:
             enhanced_analysis["entities"],
             key='id', score='relevance'
         )
-        chart = grouped_bar_chart(entities_df, "Entities by Relevance", item_col='Item')
-        if chart:
-            st.altair_chart(chart, use_container_width=True)
+        if not entities_df.empty and len(entities_df['Item'].unique()) > 0:
+            chart = grouped_bar_chart(entities_df, "Entities by Relevance", item_col='Item')
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("No entity comparison data available.")
         else:
             st.info("No entity comparison data available.")
-        
+                
         # You can repeat the above for topics, categories, and keywords if you want more charts!
     
 
