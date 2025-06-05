@@ -321,13 +321,22 @@ if analyze_button:
         updated_text, inserted = insert_keywords(user_text, recommended)
 
         # Show text after keyword insertion in a card
-        st.markdown("### ✍️ Text with Inserted Keywords")
-        if inserted:
-            st.success("Keywords successfully inserted into text:")
-        else:
-            st.info("All recommended keywords are already present in the text.")
-
-        st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
+        # Show original vs upgraded text side-by-side
+        st.markdown("### 🔍 Keyword Enhancement Comparison")
+        
+        col_a, col_b = st.columns(2)
+        
+        with col_a:
+            st.markdown("#### 📝 Original Text")
+            st.markdown(f'<div class="card">{user_text}</div>', unsafe_allow_html=True)
+        
+        with col_b:
+            st.markdown("#### 📝 Upgraded Text with Keywords")
+            if inserted:
+                st.success("Keywords successfully inserted into the text!")
+            else:
+                st.info("All recommended keywords were already present.")
+            st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
 
         # Keyword snippet highlights
         snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
