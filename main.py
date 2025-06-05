@@ -167,7 +167,12 @@ if st.button("Analyze Text"):
         # Relations
         if analysis["relations"]:
             st.subheader("Relations")
-            st.write(", ".join([r["id"] for r in analysis["relations"]]))
+            # Only include relations that have an 'id' key
+            relation_ids = [r["id"] for r in analysis["relations"] if isinstance(r, dict) and "id" in r]
+            if relation_ids:
+                st.write(", ".join(relation_ids))
+            else:
+                st.info("No valid relations with 'id' found.")
 
         # Categories
         if analysis["categories"]:
