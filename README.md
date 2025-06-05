@@ -1,0 +1,1 @@
+# Curiate-Solutions-Intern-Assignment
