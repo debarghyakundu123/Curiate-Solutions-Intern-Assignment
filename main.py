@@ -88,11 +88,13 @@ def insert_keywords(text, keywords):
     if not to_add:
         return text, False
 
+    # Insert keywords before the last period or at the end if none found
     insertion_point = text.rfind(".")
     if insertion_point == -1:
         insertion_point = len(text)
 
     keywords_phrase = ", ".join(to_add)
+    # Make sure to add a comma or "including" in a natural way
     new_text = (
         text[:insertion_point].rstrip()
         + f" including {keywords_phrase}"
@@ -101,14 +103,17 @@ def insert_keywords(text, keywords):
     return new_text, True
 
 def get_keyword_snippets(text, keywords, window=30):
+    """
+    Extract snippets from text that include each keyword with a context window.
+    """
     text_lower = text.lower()
     snippets = []
     for kw in keywords:
         pattern = re.compile(r'.{0,%d}\b%s\b.{0,%d}' % (window, re.escape(kw.lower()), window), re.IGNORECASE)
         match = pattern.search(text_lower)
         if match:
-            snippet = match.group(0)
-            snippets.append(snippet.strip())
+            snippet = match.group(0).strip()
+            snippets.append(snippet)
     return snippets
 
 # --- Streamlit App ---
@@ -175,6 +180,7 @@ st.markdown(
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         margin-bottom: 2rem;
         color: #333;
+        white-space: pre-wrap;
     }
     .badge {
         background: #764ba2;
@@ -193,6 +199,7 @@ st.markdown(
         font-style: italic;
         color: #5a4d41;
         border-radius: 10px;
+        white-space: pre-wrap;
     }
     details summary {
         font-weight: 700;
@@ -326,7 +333,7 @@ if analyze_button:
         snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
         if inserted and snippets:
             st.markdown("### 🔍 Keyword Insertion Highlights")
-            for i, snippet in enumerate(snippets):
+            for snippet in snippets:
                 st.markdown(f'<div class="highlight-snippet">…{snippet}…</div>', unsafe_allow_html=True)
         else:
             st.info("No keyword insertion snippets available.")
@@ -346,7 +353,12 @@ if analyze_button:
         with st.spinner("Generating AI suggestions... 🌟"):
             groq_response = groq_ai_request(groq_prompt)
 
-        st.text_area("AI Suggestions & Meta Description:", value=groq_response, height=280)
+        st.text_area(
+            "AI Suggestions & Meta Description:",
+            value=groq_response,
+            height=280,
+            help="You can copy the AI-generated SEO improvement suggestions and meta description here."
+        )
 
         # Bonus: share button (copy to clipboard style)
         st.markdown("""
