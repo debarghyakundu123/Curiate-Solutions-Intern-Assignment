@@ -8,7 +8,6 @@ from groq import Groq
 
 # --- Setup ---
 
-# TextRazor API key
 textrazor.api_key = "9a59e0c22ec2d995fa459cf0d61ebe07580bfaa426d1cf6dee35959e"
 client = textrazor.TextRazor(extractors=[
     "entities",
@@ -24,11 +23,10 @@ client = textrazor.TextRazor(extractors=[
     "translation"
 ])
 
-# Groq API key (or environment variable)
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or "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"
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# --- Functions ---
+# --- Helper Functions ---
 
 def groq_ai_request(prompt: str) -> str:
     try:
@@ -47,12 +45,9 @@ def analyze_text(text: str):
     seo_keywords = []
     entities = []
     topics = []
-    relations = []
     categories = []
-    words = []
     spelling_suggestions = []
 
-    # Extract entities
     for entity in response.entities():
         entities.append({
             "id": entity.id,
@@ -61,26 +56,13 @@ def analyze_text(text: str):
         })
         seo_keywords.append({"keyword": entity.id, "relevance": entity.relevance_score})
 
-    # Extract topics
     for topic in response.topics():
         topics.append({"label": topic.label, "score": topic.score})
 
-    # Extract relations
-    for rel in response.relations():
-        relations.append({"id": rel.id})
-
-    # Extract categories
     for cat in response.categories():
         categories.append({"label": cat.label, "score": cat.score})
 
-    # Extract words and spelling suggestions
     for word in response.words():
-        words.append({
-            "token": word.token,
-            "stem": word.stem,
-            "lemma": word.lemma,
-            "spelling_suggestions": word.spelling_suggestions
-        })
         if word.spelling_suggestions:
             spelling_suggestions.append({
                 "token": word.token,
@@ -91,9 +73,7 @@ def analyze_text(text: str):
         "seo_keywords": seo_keywords,
         "entities": entities,
         "topics": topics,
-        "relations": relations,
         "categories": categories,
-        "words": words,
         "spelling_suggestions": spelling_suggestions
     }
 
@@ -121,7 +101,6 @@ def insert_keywords(text, keywords):
     return new_text, True
 
 def get_keyword_snippets(text, keywords, window=30):
-    """Extract snippets around keywords in the text."""
     text_lower = text.lower()
     snippets = []
     for kw in keywords:
@@ -134,130 +113,225 @@ def get_keyword_snippets(text, keywords, window=30):
 
 # --- Streamlit App ---
 
-st.set_page_config(page_title="SEO Text Analyzer & AI Enhancer", layout="wide")
-
-st.title("SEO Text Analyzer & AI Enhancer")
-st.markdown(
-    "Enter your text below to analyze it using TextRazor, "
-    "extract SEO-relevant keywords and metrics, "
-    "and get AI-generated SEO improvement suggestions."
+st.set_page_config(
+    page_title="🔥 SEO Analyzer & AI Enhancer 🔥",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    page_icon="🚀"
 )
 
-user_text = st.text_area("Enter text to analyze:", height=200)
+st.markdown(
+    """
+    <style>
+    /* Gradient background for header */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .header {
+        font-size: 3rem;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 0.25rem;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    }
+    .subheader {
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        color: #dcd6f7;
+    }
+    .stTextArea>div>textarea {
+        font-size: 1.2rem;
+        font-weight: 500;
+        border-radius: 12px;
+        border: 2px solid #764ba2;
+        padding: 1rem;
+        min-height: 150px;
+        color: #222;
+    }
+    .btn-primary {
+        background: linear-gradient(90deg, #ff7e5f, #feb47b);
+        border: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        box-shadow: 0 4px 10px rgba(255,126,95,0.6);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white !important;
+    }
+    .btn-primary:hover {
+        box-shadow: 0 6px 20px rgba(255,126,95,0.9);
+        transform: scale(1.05);
+    }
+    .card {
+        background: white;
+        border-radius: 20px;
+        padding: 1rem 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        color: #333;
+    }
+    .badge {
+        background: #764ba2;
+        color: white;
+        border-radius: 20px;
+        padding: 0.2rem 0.8rem;
+        font-weight: 600;
+        margin-right: 6px;
+        display: inline-block;
+    }
+    .highlight-snippet {
+        background: #fffbdd;
+        border-left: 4px solid #ff7e5f;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        font-style: italic;
+        color: #5a4d41;
+        border-radius: 10px;
+    }
+    details summary {
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+    }
+    details {
+        margin-bottom: 1.5rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-if st.button("Analyze Text"):
+st.markdown('<div class="header">🔥 SEO Text Analyzer & AI Enhancer 🔥</div>', unsafe_allow_html=True)
+st.markdown('<div class="subheader">Paste your text and unlock powerful SEO insights with AI magic! ✨</div>', unsafe_allow_html=True)
+
+user_text = st.text_area("🚀 Enter your text here:", height=220, placeholder="Paste your SEO content or article here...")
+
+analyze_button = st.button("✨ Analyze & Enhance ✨", help="Click to analyze and get AI suggestions", key="analyze")
+
+if analyze_button:
     if not user_text.strip():
-        st.warning("Please enter some text to analyze.")
+        st.warning("⚠️ Please enter some text before analyzing!")
     else:
-        with st.spinner("Analyzing text with TextRazor..."):
+        with st.spinner("🛠️ Running analysis, hang tight..."):
             analysis = analyze_text(user_text)
 
-        # --- Visualizations ---
+        st.markdown("---")
 
-        st.header("TextRazor Analysis Results")
+        # Columns for charts + info
+        col1, col2 = st.columns([2, 3])
 
-        # Entities Chart
-        if analysis["entities"]:
-            st.subheader("Entities Relevance")
-            entities_df = pd.DataFrame([
-                {"Entity": e["id"], "Relevance": e["relevance"]}
-                for e in analysis["entities"]
-            ])
-            entities_chart = alt.Chart(entities_df).mark_bar().encode(
-                x=alt.X('Relevance:Q'),
-                y=alt.Y('Entity:N', sort='-x'),
-                tooltip=['Entity', 'Relevance']
-            )
-            st.altair_chart(entities_chart, use_container_width=True)
-        else:
-            st.info("No entities detected.")
+        with col1:
+            st.markdown("### 🏷️ Entities by Relevance")
+            if analysis["entities"]:
+                entities_df = pd.DataFrame([
+                    {"Entity": e["id"], "Relevance": e["relevance"]}
+                    for e in analysis["entities"]
+                ])
+                chart = alt.Chart(entities_df).mark_bar(color="#764ba2").encode(
+                    x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
+                    y=alt.Y('Entity:N', sort='-x'),
+                    tooltip=['Entity', 'Relevance']
+                ).properties(height=300)
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("No entities detected.")
 
-        # Topics Chart
-        if analysis["topics"]:
-            st.subheader("Topics Score")
-            topics_df = pd.DataFrame([
-                {"Topic": t["label"], "Score": t["score"]}
-                for t in analysis["topics"]
-            ])
-            topics_chart = alt.Chart(topics_df).mark_bar(color='orange').encode(
-                x=alt.X('Score:Q'),
-                y=alt.Y('Topic:N', sort='-x'),
-                tooltip=['Topic', 'Score']
-            )
-            st.altair_chart(topics_chart, use_container_width=True)
+            st.markdown("### 🎯 Topics by Score")
+            if analysis["topics"]:
+                topics_df = pd.DataFrame([
+                    {"Topic": t["label"], "Score": t["score"]}
+                    for t in analysis["topics"]
+                ])
+                chart = alt.Chart(topics_df).mark_bar(color="#ff7e5f").encode(
+                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
+                    y=alt.Y('Topic:N', sort='-x'),
+                    tooltip=['Topic', 'Score']
+                ).properties(height=260)
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("No topics detected.")
 
-        # Categories Chart
-        if analysis["categories"]:
-            st.subheader("Categories Score")
-            categories_df = pd.DataFrame([
-                {"Category": c["label"], "Score": c["score"]}
-                for c in analysis["categories"]
-            ])
-            categories_chart = alt.Chart(categories_df).mark_bar(color='green').encode(
-                x=alt.X('Score:Q'),
-                y=alt.Y('Category:N', sort='-x'),
-                tooltip=['Category', 'Score']
-            )
-            st.altair_chart(categories_chart, use_container_width=True)
+        with col2:
+            st.markdown("### 🗂️ Categories by Score")
+            if analysis["categories"]:
+                categories_df = pd.DataFrame([
+                    {"Category": c["label"], "Score": c["score"]}
+                    for c in analysis["categories"]
+                ])
+                chart = alt.Chart(categories_df).mark_bar(color="#feb47b").encode(
+                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
+                    y=alt.Y('Category:N', sort='-x'),
+                    tooltip=['Category', 'Score']
+                ).properties(height=570)
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("No categories detected.")
 
-        # SEO Keywords Chart & Table
+        # SEO Keywords table + badges
+        st.markdown("### 🔑 SEO Keywords and Relevance Scores")
         seo_keywords = analysis["seo_keywords"]
-        st.header("SEO Keywords and Recommendations")
         if seo_keywords:
             seo_keywords_sorted = sorted(seo_keywords, key=lambda x: x["relevance"], reverse=True)
             keywords_df = pd.DataFrame([
                 {"Keyword": kw["keyword"], "Relevance": kw["relevance"]}
                 for kw in seo_keywords_sorted
             ])
-            keywords_chart = alt.Chart(keywords_df).mark_bar(color='purple').encode(
-                x=alt.X('Relevance:Q'),
-                y=alt.Y('Keyword:N', sort='-x'),
-                tooltip=['Keyword', 'Relevance']
-            )
-            st.altair_chart(keywords_chart, use_container_width=True)
 
-            st.table([
-                {"Keyword": kw["keyword"], "Relevance": f"{kw['relevance']:.4f}"}
-                for kw in seo_keywords_sorted
-            ])
+            # Show keywords as badges
+            badge_html = ""
+            for kw in seo_keywords_sorted:
+                badge_html += f'<span class="badge">{kw["keyword"]} ({kw["relevance"]:.2f})</span> '
+
+            st.markdown(badge_html, unsafe_allow_html=True)
         else:
             st.info("No SEO keywords detected.")
 
         # Spelling Suggestions
         if analysis["spelling_suggestions"]:
-            st.subheader("Spelling Suggestions")
-            for sug in analysis["spelling_suggestions"]:
-                st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
+            with st.expander("📝 Spelling Suggestions (Click to expand)"):
+                for sug in analysis["spelling_suggestions"]:
+                    st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
 
         # Recommended Keywords filtering
         recommended = get_recommended_keywords(seo_keywords, threshold=0.2)
         if recommended:
-            st.subheader("Recommended Keywords (Relevance >= 0.2)")
-            st.write(", ".join(recommended))
+            st.markdown(f"### 💡 Recommended Keywords (Relevance ≥ 0.2):")
+            recommended_html = ""
+            for kw in recommended:
+                recommended_html += f'<span class="badge" style="background:#ff7e5f">{kw}</span> '
+            st.markdown(recommended_html, unsafe_allow_html=True)
         else:
             st.info("No recommended keywords found based on threshold.")
 
         # Insert recommended keywords into original text
         updated_text, inserted = insert_keywords(user_text, recommended)
 
-        # Get snippets for inserted keywords
-        snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
-
-        st.header("Text After Inserting Recommended Keywords")
+        # Show text after keyword insertion in a card
+        st.markdown("### ✍️ Text with Inserted Keywords")
         if inserted:
-            st.success("Recommended keywords inserted into text:")
+            st.success("Keywords successfully inserted into text:")
         else:
-            st.info("All recommended keywords already present in the text.")
-        st.write(updated_text)
+            st.info("All recommended keywords are already present in the text.")
 
-        st.header("Keyword Insertion Highlights")
+        st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
+
+        # Keyword snippet highlights
+        snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
         if inserted and snippets:
+            st.markdown("### 🔍 Keyword Insertion Highlights")
             for i, snippet in enumerate(snippets):
-                st.markdown(f"**Keyword snippet {i+1}:** ...{snippet}...")
+                st.markdown(f'<div class="highlight-snippet">…{snippet}…</div>', unsafe_allow_html=True)
         else:
-            st.info("No keyword insertion snippets to display.")
+            st.info("No keyword insertion snippets available.")
 
-        # Prepare prompt for AI with instruction to be positive only
+        # AI Prompt with positive only feedback
         groq_prompt = (
             f"Analyze the following text for SEO optimization and provide only positive feedback and praise.\n"
             f"Do NOT mention any problems or negative suggestions.\n"
@@ -266,9 +340,35 @@ if st.button("Analyze Text"):
             f"Also, suggest a positive meta description based on the text and recommended keywords: {', '.join(recommended)}"
         )
 
-        st.header("AI SEO Improvement Suggestions (Groq)")
+        st.markdown("---")
+        st.markdown("### 🤖 AI SEO Improvement Suggestions")
 
-        with st.spinner("Getting AI suggestions..."):
+        with st.spinner("Generating AI suggestions... 🌟"):
             groq_response = groq_ai_request(groq_prompt)
 
-        st.text_area("AI Suggestions and Meta Description:", value=groq_response, height=250)
+        st.text_area("AI Suggestions & Meta Description:", value=groq_response, height=280)
+
+        # Bonus: share button (copy to clipboard style)
+        st.markdown("""
+        <style>
+        .copy-button {
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(255,126,95,0.6);
+            cursor: pointer;
+            color: white;
+            margin-top: 10px;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+        .copy-button:hover {
+            box-shadow: 0 6px 20px rgba(255,126,95,0.9);
+            transform: scale(1.05);
+        }
+        </style>
+        <button class="copy-button" onclick="navigator.clipboard.writeText(document.querySelector('textarea').value)">📋 Copy AI Suggestions</button>
+        """, unsafe_allow_html=True)
