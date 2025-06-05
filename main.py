@@ -94,7 +94,6 @@ def insert_keywords(text, keywords):
         insertion_point = len(text)
 
     keywords_phrase = ", ".join(to_add)
-    # Make sure to add a comma or "including" in a natural way
     new_text = (
         text[:insertion_point].rstrip()
         + f" including {keywords_phrase}"
@@ -103,9 +102,6 @@ def insert_keywords(text, keywords):
     return new_text, True
 
 def get_keyword_snippets(text, keywords, window=30):
-    """
-    Extract snippets from text that include each keyword with a context window.
-    """
     text_lower = text.lower()
     snippets = []
     for kw in keywords:
@@ -115,6 +111,37 @@ def get_keyword_snippets(text, keywords, window=30):
             snippet = match.group(0).strip()
             snippets.append(snippet)
     return snippets
+
+def compare_items(original, enhanced, key='id', score='relevance'):
+    orig_map = {e[key]: e[score] for e in original}
+    enh_map = {e[key]: e[score] for e in enhanced}
+    all_items = set(orig_map) | set(enh_map)
+    data = []
+    for item in all_items:
+        data.append({
+            'Item': item,
+            'Original Score': orig_map.get(item, 0),
+            'Enhanced Score': enh_map.get(item, 0)
+        })
+    return pd.DataFrame(data)
+
+def grouped_bar_chart(df, title, item_col='Item'):
+    if df.empty:
+        return None
+    chart = alt.Chart(df).transform_fold(
+        ['Original Score', 'Enhanced Score'],
+        as_=['Version', 'Score']
+    ).mark_bar().encode(
+        x=alt.X('Version:N', title=None),
+        y=alt.Y('Score:Q', scale=alt.Scale(domain=[0, 1])),
+        color='Version:N',
+        column=alt.Column(f'{item_col}:N', title=None, spacing=10),
+        tooltip=[item_col, 'Version', 'Score']
+    ).properties(
+        height=300,
+        title=title
+    )
+    return chart
 
 # --- Streamlit App ---
 
@@ -128,7 +155,6 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Gradient background for header */
     .stApp {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -227,149 +253,168 @@ if analyze_button:
         st.warning("⚠️ Please enter some text before analyzing!")
     else:
         with st.spinner("🛠️ Running analysis, hang tight..."):
-            analysis = analyze_text(user_text)
+            # Analyze original
+            original_analysis = analyze_text(user_text)
+            # Get recommended keywords
+            recommended = get_recommended_keywords(original_analysis["seo_keywords"], threshold=0.2)
+            # Insert keywords
+            updated_text, inserted = insert_keywords(user_text, recommended)
+            # Analyze enhanced
+            enhanced_analysis = analyze_text(updated_text)
 
         st.markdown("---")
+        st.markdown("## 📊 SEO Comparison: Original vs Enhanced")
 
-        # Columns for charts + info
-        col1, col2 = st.columns([2, 3])
+        # --- Entities Comparison ---
+        st.markdown("### 🏷️ Entities Relevance Comparison")
+        entities_df = compare_items(
+            original_analysis["entities"],
+            enhanced_analysis["entities"],
+            key='id', score='relevance'
+        )
+        chart = grouped_bar_chart(entities_df, "Entities by Relevance", item_col='Item')
+        if chart:
+            st.altair_chart(chart, use_container_width=True)
+        st.dataframe(entities_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
-        with col1:
-            st.markdown("### 🏷️ Entities by Relevance")
-            if analysis["entities"]:
-                entities_df = pd.DataFrame([
-                    {"Entity": e["id"], "Relevance": e["relevance"]}
-                    for e in analysis["entities"]
-                ])
-                chart = alt.Chart(entities_df).mark_bar(color="#764ba2").encode(
-                    x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Entity:N', sort='-x'),
-                    tooltip=['Entity', 'Relevance']
-                ).properties(height=300)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No entities detected.")
+        # --- Topics Comparison ---
+        st.markdown("### 🎯 Topics Score Comparison")
+        topics_df = compare_items(
+            original_analysis["topics"],
+            enhanced_analysis["topics"],
+            key='label', score='score'
+        )
+        chart = grouped_bar_chart(topics_df, "Topics by Score", item_col='Item')
+        if chart:
+            st.altair_chart(chart, use_container_width=True)
+        st.dataframe(topics_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
-            st.markdown("### 🎯 Topics by Score")
-            if analysis["topics"]:
-                topics_df = pd.DataFrame([
-                    {"Topic": t["label"], "Score": t["score"]}
-                    for t in analysis["topics"]
-                ])
-                chart = alt.Chart(topics_df).mark_bar(color="#ff7e5f").encode(
-                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Topic:N', sort='-x'),
-                    tooltip=['Topic', 'Score']
-                ).properties(height=260)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No topics detected.")
+        # --- Categories Comparison ---
+        st.markdown("### 🗂️ Categories Score Comparison")
+        categories_df = compare_items(
+            original_analysis["categories"],
+            enhanced_analysis["categories"],
+            key='label', score='score'
+        )
+        chart = grouped_bar_chart(categories_df, "Categories by Score", item_col='Item')
+        if chart:
+            st.altair_chart(chart, use_container_width=True)
+        st.dataframe(categories_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
-        with col2:
-            st.markdown("### 🗂️ Categories by Score")
-            if analysis["categories"]:
-                categories_df = pd.DataFrame([
-                    {"Category": c["label"], "Score": c["score"]}
-                    for c in analysis["categories"]
-                ])
-                chart = alt.Chart(categories_df).mark_bar(color="#feb47b").encode(
-                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Category:N', sort='-x'),
-                    tooltip=['Category', 'Score']
-                ).properties(height=570)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No categories detected.")
+        # --- SEO Keywords Comparison ---
+        st.markdown("### 🔑 SEO Keywords Relevance Comparison")
+        keywords_df = compare_items(
+            original_analysis["seo_keywords"],
+            enhanced_analysis["seo_keywords"],
+            key='keyword', score='relevance'
+        )
+        chart = grouped_bar_chart(keywords_df, "SEO Keywords by Relevance", item_col='Item')
+        if chart:
+            st.altair_chart(chart, use_container_width=True)
+        st.dataframe(keywords_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
-        # SEO Keywords table + badges
-        st.markdown("### 🔑 SEO Keywords and Relevance Scores")
-        seo_keywords = analysis["seo_keywords"]
-        if seo_keywords:
-            seo_keywords_sorted = sorted(seo_keywords, key=lambda x: x["relevance"], reverse=True)
-            keywords_df = pd.DataFrame([
-                {"Keyword": kw["keyword"], "Relevance": kw["relevance"]}
-                for kw in seo_keywords_sorted
-            ])
+        # --- Keyword Presence & Highlights ---
+        st.markdown("### 💡 Keyword Presence & Highlights")
+        present_before = [kw for kw in recommended if re.search(r'\b' + re.escape(kw.lower()) + r'\b', user_text.lower())]
+        present_after = [kw for kw in recommended if re.search(r'\b' + re.escape(kw.lower()) + r'\b', updated_text.lower())]
+        added = [kw for kw in present_after if kw not in present_before]
 
-            # Show keywords as badges
-            badge_html = ""
-            for kw in seo_keywords_sorted:
-                badge_html += f'<span class="badge">{kw["keyword"]} ({kw["relevance"]:.2f})</span> '
+        st.write(f"**Recommended keywords present in original:** {', '.join(present_before) if present_before else 'None'}")
+        st.write(f"**Recommended keywords present after enhancement:** {', '.join(present_after) if present_after else 'None'}")
+        st.write(f"**New keywords added:** {', '.join(added) if added else 'None'}")
 
-            st.markdown(badge_html, unsafe_allow_html=True)
-        else:
-            st.info("No SEO keywords detected.")
+        if added:
+            st.markdown("#### 🔍 New Keyword Insertion Snippets")
+            snippets = get_keyword_snippets(updated_text, added)
+            for snippet in snippets:
+                st.markdown(f'<div class="highlight-snippet">…{snippet}…</div>', unsafe_allow_html=True)
 
-        # Spelling Suggestions
-        if analysis["spelling_suggestions"]:
+        # --- Analytics Insights ---
+        st.markdown("### 📈 Analytics Insights")
+
+        def avg_score(df, col):
+            if df.empty: return 0
+            return df[col].mean()
+
+        insights = []
+        # Entities
+        orig_entities = len(original_analysis["entities"])
+        enh_entities = len(enhanced_analysis["entities"])
+        avg_ent_orig = avg_score(entities_df, "Original Score")
+        avg_ent_enh = avg_score(entities_df, "Enhanced Score")
+        insights.append(f"**Entities:** {orig_entities} → {enh_entities} (avg relevance {avg_ent_orig:.2f} → {avg_ent_enh:.2f})")
+        # Topics
+        orig_topics = len(original_analysis["topics"])
+        enh_topics = len(enhanced_analysis["topics"])
+        avg_top_orig = avg_score(topics_df, "Original Score")
+        avg_top_enh = avg_score(topics_df, "Enhanced Score")
+        insights.append(f"**Topics:** {orig_topics} → {enh_topics} (avg score {avg_top_orig:.2f} → {avg_top_enh:.2f})")
+        # Categories
+        orig_cats = len(original_analysis["categories"])
+        enh_cats = len(enhanced_analysis["categories"])
+        avg_cat_orig = avg_score(categories_df, "Original Score")
+        avg_cat_enh = avg_score(categories_df, "Enhanced Score")
+        insights.append(f"**Categories:** {orig_cats} → {enh_cats} (avg score {avg_cat_orig:.2f} → {avg_cat_enh:.2f})")
+        # Keywords
+        orig_kw = len(original_analysis["seo_keywords"])
+        enh_kw = len(enhanced_analysis["seo_keywords"])
+        avg_kw_orig = avg_score(keywords_df, "Original Score")
+        avg_kw_enh = avg_score(keywords_df, "Enhanced Score")
+        insights.append(f"**SEO Keywords:** {orig_kw} → {enh_kw} (avg relevance {avg_kw_orig:.2f} → {avg_kw_enh:.2f})")
+
+        st.markdown("\n".join(insights))
+
+        # --- Spelling Suggestions ---
+        if original_analysis["spelling_suggestions"] or enhanced_analysis["spelling_suggestions"]:
             with st.expander("📝 Spelling Suggestions (Click to expand)"):
-                for sug in analysis["spelling_suggestions"]:
+                st.write("**Original Text:**")
+                for sug in original_analysis["spelling_suggestions"]:
+                    st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
+                st.write("**Enhanced Text:**")
+                for sug in enhanced_analysis["spelling_suggestions"]:
                     st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
 
-        # Recommended Keywords filtering
-        recommended = get_recommended_keywords(seo_keywords, threshold=0.2)
-        if recommended:
-            st.markdown(f"### 💡 Recommended Keywords (Relevance ≥ 0.2):")
-            recommended_html = ""
-            for kw in recommended:
-                recommended_html += f'<span class="badge" style="background:#ff7e5f">{kw}</span> '
-            st.markdown(recommended_html, unsafe_allow_html=True)
-        else:
-            st.info("No recommended keywords found based on threshold.")
-
-        # Insert recommended keywords into original text
-        updated_text, inserted = insert_keywords(user_text, recommended)
-
-        # Show text after keyword insertion in a card
-        # Show original vs upgraded text side-by-side
-        st.markdown("### 🔍 Keyword Enhancement Comparison")
-        
+        # --- Show Original vs Enhanced Text ---
+        st.markdown("### 📝 Original vs Enhanced Text")
         col_a, col_b = st.columns(2)
-        
         with col_a:
-            st.markdown("#### 📝 Original Text")
+            st.markdown("#### Original Text")
             st.markdown(f'<div class="card">{user_text}</div>', unsafe_allow_html=True)
-        
         with col_b:
-            st.markdown("#### 📝 Upgraded Text with Keywords")
+            st.markdown("#### Enhanced Text")
             if inserted:
                 st.success("Keywords successfully inserted into the text!")
             else:
                 st.info("All recommended keywords were already present.")
             st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
 
-        # Keyword snippet highlights
-        snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
-        if inserted and snippets:
-            st.markdown("### 🔍 Keyword Insertion Highlights")
-            for snippet in snippets:
-                st.markdown(f'<div class="highlight-snippet">…{snippet}…</div>', unsafe_allow_html=True)
-        else:
-            st.info("No keyword insertion snippets available.")
-
-        # AI Prompt with positive only feedback
-        groq_prompt = (
-            f"Analyze the following text for SEO optimization and provide only positive feedback and praise.\n"
-            f"Do NOT mention any problems or negative suggestions.\n"
-            f"Show how the suggested keywords improve the text by giving a snippet with a few words before and after the inserted keywords.\n\n"
-            f"{updated_text}\n\n"
-            f"Also, suggest a positive meta description based on the text and recommended keywords: {', '.join(recommended)}"
-        )
-
+        # --- AI Positive Summary via Groq ---
         st.markdown("---")
-        st.markdown("### 🤖 AI SEO Improvement Suggestions")
+        st.markdown("### 🤖 AI SEO Improvement Summary")
 
-        with st.spinner("Generating AI suggestions... 🌟"):
+        groq_prompt = (
+            "Compare the following two texts for SEO optimization. "
+            "Highlight only positive improvements and praise the enhanced version, "
+            "focusing on new or improved entities, topics, categories, and keywords. "
+            "Show keyword highlights and provide a positive meta description. "
+            "Do not mention any negative points.\n\n"
+            "Original Text:\n"
+            f"{user_text}\n\n"
+            "Enhanced Text:\n"
+            f"{updated_text}\n\n"
+            f"Recommended Keywords: {', '.join(recommended)}"
+        )
+        with st.spinner("Generating AI summary... 🌟"):
             groq_response = groq_ai_request(groq_prompt)
 
         st.text_area(
-            "AI Suggestions & Meta Description:",
+            "AI SEO Summary & Meta Description:",
             value=groq_response,
             height=280,
-            help="You can copy the AI-generated SEO improvement suggestions and meta description here."
+            help="Copy the AI-generated SEO summary and meta description here."
         )
 
-        # Bonus: share button (copy to clipboard style)
+        # --- Copy to Clipboard Button ---
         st.markdown("""
         <style>
         .copy-button {
@@ -391,5 +436,5 @@ if analyze_button:
             transform: scale(1.05);
         }
         </style>
-        <button class="copy-button" onclick="navigator.clipboard.writeText(document.querySelector('textarea').value)">📋 Copy AI Suggestions</button>
+        <button class="copy-button" onclick="navigator.clipboard.writeText(document.querySelector('textarea').value)">📋 Copy AI Summary</button>
         """, unsafe_allow_html=True)
