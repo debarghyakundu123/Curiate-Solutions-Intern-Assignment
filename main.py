@@ -2,6 +2,8 @@ import os
 import re
 import streamlit as st
 import textrazor
+import pandas as pd
+import altair as alt
 from groq import Groq
 
 # --- Setup ---
@@ -80,7 +82,6 @@ def analyze_text(text: str):
             "spelling_suggestions": word.spelling_suggestions
         })
         if word.spelling_suggestions:
-            # spelling_suggestions is a list of strings normally
             spelling_suggestions.append({
                 "token": word.token,
                 "suggestions": word.spelling_suggestions
@@ -119,6 +120,18 @@ def insert_keywords(text, keywords):
     )
     return new_text, True
 
+def get_keyword_snippets(text, keywords, window=30):
+    """Extract snippets around keywords in the text."""
+    text_lower = text.lower()
+    snippets = []
+    for kw in keywords:
+        pattern = re.compile(r'.{0,%d}\b%s\b.{0,%d}' % (window, re.escape(kw.lower()), window), re.IGNORECASE)
+        match = pattern.search(text_lower)
+        if match:
+            snippet = match.group(0)
+            snippets.append(snippet.strip())
+    return snippets
+
 # --- Streamlit App ---
 
 st.set_page_config(page_title="SEO Text Analyzer & AI Enhancer", layout="wide")
@@ -139,61 +152,70 @@ if st.button("Analyze Text"):
         with st.spinner("Analyzing text with TextRazor..."):
             analysis = analyze_text(user_text)
 
-        # Display TextRazor analysis metrics
+        # --- Visualizations ---
+
         st.header("TextRazor Analysis Results")
 
-        # Entities table
+        # Entities Chart
         if analysis["entities"]:
-            st.subheader("Entities")
-            st.table([
-                {
-                    "Entity": e["id"],
-                    "Relevance": f"{e['relevance']:.4f}",
-                    "Confidence": f"{e['confidence']:.4f}"
-                }
+            st.subheader("Entities Relevance")
+            entities_df = pd.DataFrame([
+                {"Entity": e["id"], "Relevance": e["relevance"]}
                 for e in analysis["entities"]
             ])
+            entities_chart = alt.Chart(entities_df).mark_bar().encode(
+                x=alt.X('Relevance:Q'),
+                y=alt.Y('Entity:N', sort='-x'),
+                tooltip=['Entity', 'Relevance']
+            )
+            st.altair_chart(entities_chart, use_container_width=True)
         else:
             st.info("No entities detected.")
 
-        # Topics
+        # Topics Chart
         if analysis["topics"]:
-            st.subheader("Topics")
-            st.table([
-                {"Topic": t["label"], "Score": f"{t['score']:.4f}"}
+            st.subheader("Topics Score")
+            topics_df = pd.DataFrame([
+                {"Topic": t["label"], "Score": t["score"]}
                 for t in analysis["topics"]
             ])
+            topics_chart = alt.Chart(topics_df).mark_bar(color='orange').encode(
+                x=alt.X('Score:Q'),
+                y=alt.Y('Topic:N', sort='-x'),
+                tooltip=['Topic', 'Score']
+            )
+            st.altair_chart(topics_chart, use_container_width=True)
 
-        # Relations
-        if analysis["relations"]:
-            st.subheader("Relations")
-            relation_ids = [r["id"] for r in analysis["relations"] if isinstance(r, dict) and "id" in r]
-            if relation_ids:
-                st.write(", ".join(str(rid) for rid in relation_ids))  # convert each to str here
-            else:
-                st.info("No valid relations with 'id' found.")
-
-        # Categories
+        # Categories Chart
         if analysis["categories"]:
-            st.subheader("Categories")
-            st.table([
-                {"Category": c["label"], "Score": f"{c['score']:.4f}"}
+            st.subheader("Categories Score")
+            categories_df = pd.DataFrame([
+                {"Category": c["label"], "Score": c["score"]}
                 for c in analysis["categories"]
             ])
+            categories_chart = alt.Chart(categories_df).mark_bar(color='green').encode(
+                x=alt.X('Score:Q'),
+                y=alt.Y('Category:N', sort='-x'),
+                tooltip=['Category', 'Score']
+            )
+            st.altair_chart(categories_chart, use_container_width=True)
 
-        # Spelling suggestions
-        if analysis["spelling_suggestions"]:
-            st.subheader("Spelling Suggestions")
-            for sug in analysis["spelling_suggestions"]:
-                # Join suggestions safely assuming list of strings
-                st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
-
-        # SEO Keywords and Recommendations
+        # SEO Keywords Chart & Table
         seo_keywords = analysis["seo_keywords"]
-
         st.header("SEO Keywords and Recommendations")
         if seo_keywords:
             seo_keywords_sorted = sorted(seo_keywords, key=lambda x: x["relevance"], reverse=True)
+            keywords_df = pd.DataFrame([
+                {"Keyword": kw["keyword"], "Relevance": kw["relevance"]}
+                for kw in seo_keywords_sorted
+            ])
+            keywords_chart = alt.Chart(keywords_df).mark_bar(color='purple').encode(
+                x=alt.X('Relevance:Q'),
+                y=alt.Y('Keyword:N', sort='-x'),
+                tooltip=['Keyword', 'Relevance']
+            )
+            st.altair_chart(keywords_chart, use_container_width=True)
+
             st.table([
                 {"Keyword": kw["keyword"], "Relevance": f"{kw['relevance']:.4f}"}
                 for kw in seo_keywords_sorted
@@ -201,8 +223,14 @@ if st.button("Analyze Text"):
         else:
             st.info("No SEO keywords detected.")
 
-        recommended = get_recommended_keywords(seo_keywords, threshold=0.2)
+        # Spelling Suggestions
+        if analysis["spelling_suggestions"]:
+            st.subheader("Spelling Suggestions")
+            for sug in analysis["spelling_suggestions"]:
+                st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
 
+        # Recommended Keywords filtering
+        recommended = get_recommended_keywords(seo_keywords, threshold=0.2)
         if recommended:
             st.subheader("Recommended Keywords (Relevance >= 0.2)")
             st.write(", ".join(recommended))
@@ -211,6 +239,10 @@ if st.button("Analyze Text"):
 
         # Insert recommended keywords into original text
         updated_text, inserted = insert_keywords(user_text, recommended)
+
+        # Get snippets for inserted keywords
+        snippets = get_keyword_snippets(updated_text, recommended) if inserted else []
+
         st.header("Text After Inserting Recommended Keywords")
         if inserted:
             st.success("Recommended keywords inserted into text:")
@@ -218,11 +250,20 @@ if st.button("Analyze Text"):
             st.info("All recommended keywords already present in the text.")
         st.write(updated_text)
 
-        # Prepare prompt for AI
+        st.header("Keyword Insertion Highlights")
+        if inserted and snippets:
+            for i, snippet in enumerate(snippets):
+                st.markdown(f"**Keyword snippet {i+1}:** ...{snippet}...")
+        else:
+            st.info("No keyword insertion snippets to display.")
+
+        # Prepare prompt for AI with instruction to be positive only
         groq_prompt = (
-            f"Analyze the following text for SEO optimization and explain how to improve it:\n\n"
+            f"Analyze the following text for SEO optimization and provide only positive feedback and praise.\n"
+            f"Do NOT mention any problems or negative suggestions.\n"
+            f"Show how the suggested keywords improve the text by giving a snippet with a few words before and after the inserted keywords.\n\n"
             f"{updated_text}\n\n"
-            f"Also, suggest a meta description based on the text and recommended keywords: {', '.join(recommended)}"
+            f"Also, suggest a positive meta description based on the text and recommended keywords: {', '.join(recommended)}"
         )
 
         st.header("AI SEO Improvement Suggestions (Groq)")
