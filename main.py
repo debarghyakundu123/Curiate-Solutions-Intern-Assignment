@@ -71,7 +71,7 @@ def analyze_text(text: str):
     for cat in response.categories():
         categories.append({"label": cat.label, "score": cat.score})
 
-    # Extract words
+    # Extract words and spelling suggestions
     for word in response.words():
         words.append({
             "token": word.token,
@@ -80,6 +80,7 @@ def analyze_text(text: str):
             "spelling_suggestions": word.spelling_suggestions
         })
         if word.spelling_suggestions:
+            # spelling_suggestions is a list of strings normally
             spelling_suggestions.append({
                 "token": word.token,
                 "suggestions": word.spelling_suggestions
@@ -180,7 +181,8 @@ if st.button("Analyze Text"):
         if analysis["spelling_suggestions"]:
             st.subheader("Spelling Suggestions")
             for sug in analysis["spelling_suggestions"]:
-                st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(sug['suggestions'])}")
+                # Join suggestions safely assuming list of strings
+                st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
 
         # SEO Keywords and Recommendations
         seo_keywords = analysis["seo_keywords"]
@@ -225,4 +227,3 @@ if st.button("Analyze Text"):
             groq_response = groq_ai_request(groq_prompt)
 
         st.text_area("AI Suggestions and Meta Description:", value=groq_response, height=250)
-
