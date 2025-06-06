@@ -36,16 +36,52 @@ You need **two API keys** to run this project:
 
 - **TextRazor:** Get your free API key [here](https://www.textrazor.com/signup).
 - **Groq API:** Sign up and get access [here](https://www.groq.com/signup).
-
+---
 
 🖼️ App Screenshots
 <!-- Add screenshot in repo -->
 
+### 1. Home Screen
+
+<img src="https://github.com/user-attachments/assets/e949da3c-f595-42c6-bcd1-5eeee2068dde" width="300" alt="Home Screen">
+
+---
+
+### 2. Input Text Area
+
+<img src="https://github.com/user-attachments/assets/d1f59899-e3fa-40df-aa4c-591ede5f556b" width="300" alt="Input Text Area">
+
+---
+
+### 3. Keyword Suggestions
+
+<img src="https://github.com/user-attachments/assets/19c36812-522e-4a48-884d-bedd5d9147f5" width="300" alt="Keyword Suggestions">
+
+---
+
+### 4. Text Comparison Before and After
+
+<img src="https://github.com/user-attachments/assets/c5533635-3cd1-4895-8ae5-82d848c08bf3" width="300" alt="Text Comparison">
+
+---
+
+### 5. SEO Score and Analysis
+
+<img src="https://github.com/user-attachments/assets/617d5f86-a163-4683-8c3f-82d0e4a674ef" width="300" alt="SEO Score and Analysis">
+
+---
+
+### 6. Meta Description Suggestion
+
+<img src="https://github.com/user-attachments/assets/7ac5ff5a-25e3-498a-9863-7663508fcffe" width="300" alt="Meta Description Suggestion">
+
+---
+---
 👤 Author
 Debarghya Kundu
 📫 LinkedIn
 📧 Email: debarghyakundu319@gmail.com
-
+---
 💡 Future Improvements
 Add support for multiple languages
 
