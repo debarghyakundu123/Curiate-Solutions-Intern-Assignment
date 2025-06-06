@@ -115,25 +115,31 @@ def get_keyword_snippets(text, keywords, window=30):
 
 def highlight_inserted_keywords(text, keywords):
     """Wrap each keyword in <mark> tags for highlighting in HTML."""
-    # Sort keywords by length descending to avoid nested replacements
     keywords = sorted(keywords, key=len, reverse=True)
-    escaped_text = html.escape(text)  # escape HTML special chars
+    escaped_text = html.escape(text)
     
     for kw in keywords:
-        # Escape keyword to avoid HTML issues
         kw_escaped = html.escape(kw)
-        # Use regex for whole word matching, case-insensitive
         pattern = re.compile(rf'\b({re.escape(kw_escaped)})\b', re.IGNORECASE)
-        # Replace with highlighted span
         escaped_text = pattern.sub(r'<mark>\1</mark>', escaped_text)
     
-    # Wrap in a scrollable div with fixed height
+    # Black background with light text and padding
     html_text = f"""
-    <div style="height:300px; overflow-y:auto; font-family: monospace; background:#f0f0f0; padding:10px; border-radius:8px;">
+    <div style="
+        height:300px; 
+        overflow-y:auto; 
+        font-family: monospace; 
+        background:#000000; 
+        color:#eeeeee; 
+        padding:10px; 
+        border-radius:8px;
+        white-space: pre-wrap;
+        ">
     {escaped_text}
     </div>
     """
     return html_text
+
 
 
 # --- Streamlit App ---
