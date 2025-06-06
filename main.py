@@ -7,6 +7,23 @@ import textrazor
 import pandas as pd
 import altair as alt
 from groq import Groq
+import webbrowser
+
+# --- Title ---
+st.title("Welcome to the SEO Analyzer & AI Enhancer 🧠📈")
+
+# --- Subtitle or Welcome Message ---
+st.markdown("### 🚀 Supercharge Your Content with AI and SEO Insights")
+
+# --- LinkedIn Button Section ---
+st.markdown("### 🔗 Connect with Me")
+
+# Replace this with your actual LinkedIn ID
+linkedin_id = "debarghyakundu319"  # Just your ID, not full URL
+linkedin_url = f"https://www.linkedin.com/in/{linkedin_id}"
+
+if st.button("🔗 Visit My LinkedIn"):
+    webbrowser.open_new_tab(linkedin_url)
 
 # --- Setup ---
 
