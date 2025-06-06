@@ -353,7 +353,6 @@ if analyze_button:
                 highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
                 st.markdown(highlighted_text, unsafe_allow_html=True)
             else:
-                st.code(updated_text, language="markdown")
                 st.text_area("Enhanced Text", value=updated_text, height=300)
 
 
