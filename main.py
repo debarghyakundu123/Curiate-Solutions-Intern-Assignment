@@ -344,7 +344,6 @@ if analyze_button:
         with before_col:
             st.markdown("**📝 Original Text**")
             st.text_area("Original Text", value=user_text, height=300)  # adjust height as needed
-            st.code(user_text, language="markdown")
         
         with after_col:
             st.markdown("**✅ Enhanced Text with Keywords**")
