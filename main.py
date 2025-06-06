@@ -262,21 +262,7 @@ if analyze_button:
                 else:
                     st.info("No topics detected.")
 
-        with col2:
-            st.markdown("### 🗂️ Categories by Score")
-            if analysis["categories"]:
-                categories_df = pd.DataFrame([
-                    {"Category": c["label"], "Score": c["score"]}
-                    for c in analysis["categories"]
-                ])
-                chart = alt.Chart(categories_df).mark_bar(color="#feb47b").encode(
-                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Category:N', sort='-x'),
-                    tooltip=['Category', 'Score']
-                ).properties(height=570)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No categories detected.")
+
 
         # SEO Keywords table + badges
         st.markdown("### 🔑 SEO Keywords and Relevance Scores")
