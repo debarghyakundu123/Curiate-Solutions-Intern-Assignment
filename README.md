@@ -61,7 +61,7 @@ You need **two API keys** to run this project:
 
 ### 4. Text Comparison Before and After
 
-<img src="https://github.com/user-attachments/assets/c5533635-3cd1-4895-8ae5-82d848c08bf3" width="300" alt="Text Comparison">
+<img src="https://github.com/user-attachments/assets/e8890b00-809f-4590-9256-e34aba66d28d" width="300" alt="Text Comparison">
 
 ---
 
