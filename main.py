@@ -225,6 +225,7 @@ if analyze_button:
         st.markdown("---")
 
         # Columns for charts + info
+        col1 = st.container()
 
         with col1:
             left_col, spacer_col, right_col = st.columns([3, 6, 3])  # Left and Right narrow, middle wide spacer
