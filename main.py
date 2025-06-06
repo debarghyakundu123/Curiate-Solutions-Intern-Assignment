@@ -242,7 +242,7 @@ if analyze_button:
                         x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
                         y=alt.Y('Entity:N', sort='-x'),
                         tooltip=['Entity', 'Relevance']
-                    ).properties(height=400)  # Bigger height for bigger display
+                    ).properties(height=800)  # Bigger height for bigger display
                     st.altair_chart(chart, use_container_width=True)
                 else:
                     st.info("No entities detected.")
