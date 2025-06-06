@@ -230,11 +230,9 @@ if analyze_button:
         with col1:
             left_col, spacer_col, right_col = st.columns([3, 6, 3])  # Left and Right narrow, middle wide spacer
             
-            with left_col:
-                
-                st.markdown("### 🏷️ Entities by Relevance")
-                st.markdown("<p style='color:#555; font-size:14px;'>Shows key entities found in your text, ranked by relevance score (0 to 1).</p>", unsafe_allow_html=True)
             
+            with left_col:
+                st.markdown("### 🏷️ Entities by Relevance")
                 if analysis["entities"]:
                     entities_df = pd.DataFrame([
                         {"Entity": e["id"], "Relevance": e["relevance"]}
@@ -244,16 +242,12 @@ if analyze_button:
                         x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
                         y=alt.Y('Entity:N', sort='-x'),
                         tooltip=['Entity', 'Relevance']
-                    ).properties(width=320, height=400)  # Set width explicitly
-            
-                    st.markdown("<div style='display:flex; justify-content:center; padding:10px;'>", unsafe_allow_html=True)
-                    st.altair_chart(chart, use_container_width=False)
-                    st.markdown("</div>", unsafe_allow_html=True)
+                    ).properties(height=400)  # Bigger height for bigger display
+                    st.altair_chart(chart, use_container_width=True)
                 else:
                     st.info("No entities detected.")
-
-            
-            # Spacer column just empty for big space
+        
+        # Spacer column just empty for big space
         
             with right_col:
                 st.markdown("### 🎯 Topics by Score")
