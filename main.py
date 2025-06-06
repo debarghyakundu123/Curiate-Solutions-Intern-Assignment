@@ -159,10 +159,6 @@ st.set_page_config(
 st.title("Welcome to the SEO Analyzer & AI Enhancer 🧠📈")
 st.markdown("### 🚀 Supercharge Your Content with AI and SEO Insights")
 
-linkedin_url = "https://www.linkedin.com/in/debarghyakundu/"
-
-if st.button("🔗 Visit My LinkedIn Profile"):
-    webbrowser.open_new_tab(linkedin_url)
 st.markdown(
     """
     <a href="https://www.linkedin.com/in/debarghyakundu/" target="_blank">
