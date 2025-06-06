@@ -88,7 +88,7 @@ def insert_keywords(text, keywords):
     to_add = [kw for kw in keywords if kw.lower() not in present]
 
     if not to_add:
-        return text, False
+        return text, False, []
 
     insertion_point = text.rfind(".")
     if insertion_point == -1:
@@ -100,7 +100,8 @@ def insert_keywords(text, keywords):
         + f" including {keywords_phrase}"
         + text[insertion_point:]
     )
-    return new_text, True
+    return new_text, True, to_add
+
 
 def get_keyword_snippets(text, keywords, window=30):
     text_lower = text.lower()
@@ -117,12 +118,15 @@ def highlight_inserted_keywords(text, keywords):
     """Wrap each keyword in <mark> tags for highlighting in HTML."""
     keywords = sorted(keywords, key=len, reverse=True)
     escaped_text = html.escape(text)
+    safe_text = html.escape(text)
+
     
     for kw in keywords:
         kw_escaped = html.escape(kw)
         pattern = re.compile(rf'\b({re.escape(kw_escaped)})\b', re.IGNORECASE)
         escaped_text = pattern.sub(r'<mark>\1</mark>', escaped_text)
-    
+        safe_text = pattern.sub(f'<span style="background-color:#000;color:#fff;padding:0 4px;border-radius:4px;">{kw}</span>', safe_text)
+
     # Black background with light text and padding
     html_text = f"""
     <div style="
@@ -334,24 +338,21 @@ if analyze_button:
             st.info("No recommended keywords found based on threshold.")
 
         # Insert recommended keywords into original text
-        updated_text, inserted = insert_keywords(user_text, recommended)
+        updated_text, inserted, inserted_keywords = insert_keywords(user_text, recommended)
         st.markdown("### 🔄 Before vs After: Text Comparison")
         before_col, after_col = st.columns(2)
         with before_col:
             st.markdown("**📝 Original Text**")
-            st.text_area("Original Text", value=user_text, height=300)
+            st.code(user_text, language="markdown")
         
         with after_col:
             st.markdown("**✅ Enhanced Text with Keywords**")
-            if inserted:
-                # Highlight only inserted keywords, i.e. those added just now
-                inserted_keywords = [kw for kw in recommended if kw.lower() not in [w.lower() for w in user_text.split()]]
-                # Better approach: the `to_add` list from insert_keywords can be returned, but here we approximate
+            if inserted and inserted_keywords:
+                # Highlight only the inserted keywords/phrases
                 highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
                 st.markdown(highlighted_text, unsafe_allow_html=True)
             else:
-                st.text_area("Enhanced Text", value=updated_text, height=300)
-        
+                st.code(updated_text, language="markdown")
 
         
         # Show text after keyword insertion in a card
