@@ -1,5 +1,7 @@
 import os
 import re
+import html
+
 import streamlit as st
 import textrazor
 import pandas as pd
@@ -110,6 +112,29 @@ def get_keyword_snippets(text, keywords, window=30):
             snippet = match.group(0)
             snippets.append(snippet.strip())
     return snippets
+
+def highlight_inserted_keywords(text, keywords):
+    """Wrap each keyword in <mark> tags for highlighting in HTML."""
+    # Sort keywords by length descending to avoid nested replacements
+    keywords = sorted(keywords, key=len, reverse=True)
+    escaped_text = html.escape(text)  # escape HTML special chars
+    
+    for kw in keywords:
+        # Escape keyword to avoid HTML issues
+        kw_escaped = html.escape(kw)
+        # Use regex for whole word matching, case-insensitive
+        pattern = re.compile(rf'\b({re.escape(kw_escaped)})\b', re.IGNORECASE)
+        # Replace with highlighted span
+        escaped_text = pattern.sub(r'<mark>\1</mark>', escaped_text)
+    
+    # Wrap in a scrollable div with fixed height
+    html_text = f"""
+    <div style="height:300px; overflow-y:auto; font-family: monospace; background:#f0f0f0; padding:10px; border-radius:8px;">
+    {escaped_text}
+    </div>
+    """
+    return html_text
+
 
 # --- Streamlit App ---
 
@@ -308,10 +333,19 @@ if analyze_button:
         before_col, after_col = st.columns(2)
         with before_col:
             st.markdown("**📝 Original Text**")
-            st.code(user_text, language="markdown")
+            st.text_area("Original Text", value=user_text, height=300)
+        
         with after_col:
             st.markdown("**✅ Enhanced Text with Keywords**")
-            st.code(updated_text, language="markdown")
+            if inserted:
+                # Highlight only inserted keywords, i.e. those added just now
+                inserted_keywords = [kw for kw in recommended if kw.lower() not in [w.lower() for w in user_text.split()]]
+                # Better approach: the `to_add` list from insert_keywords can be returned, but here we approximate
+                highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
+                st.markdown(highlighted_text, unsafe_allow_html=True)
+            else:
+                st.text_area("Enhanced Text", value=updated_text, height=300)
+        
 
         
         # Show text after keyword insertion in a card
