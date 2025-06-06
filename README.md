@@ -3,6 +3,10 @@
 
 ---
 
+### Live Demo LINK = [https://curiate-solutions-intern-assignment.streamlit.app/ ](https://drive.google.com/file/d/1BcNhwgvan978l4RV3b16EC9wBpQu-tAD/view)
+
+---
+
 ### 🚀 Features of the SEO Analyzer & AI Enhancer
 
 #### 🔍 SEO Keyword Extraction
