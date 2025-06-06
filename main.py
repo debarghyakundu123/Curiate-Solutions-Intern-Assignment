@@ -343,6 +343,7 @@ if analyze_button:
         before_col, after_col = st.columns(2)
         with before_col:
             st.markdown("**📝 Original Text**")
+            st.text_area("Original Text", value=user_text, height=300)  # adjust height as needed
             st.code(user_text, language="markdown")
         
         with after_col:
@@ -353,6 +354,8 @@ if analyze_button:
                 st.markdown(highlighted_text, unsafe_allow_html=True)
             else:
                 st.code(updated_text, language="markdown")
+                st.text_area("Enhanced Text", value=updated_text, height=300)
+
 
         
         # Show text after keyword insertion in a card
