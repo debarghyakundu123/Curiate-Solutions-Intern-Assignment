@@ -348,12 +348,11 @@ if analyze_button:
         with after_col:
             st.markdown("**✅ Enhanced Text with Keywords**")
             if inserted and inserted_keywords:
-                # Highlight only the inserted keywords/phrases
                 highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
                 st.markdown(highlighted_text, unsafe_allow_html=True)
             else:
                 st.text_area("Enhanced Text", value=updated_text, height=300)
-
+        
 
         
         # Show text after keyword insertion in a card
