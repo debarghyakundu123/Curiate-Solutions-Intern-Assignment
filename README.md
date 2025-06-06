@@ -76,15 +76,17 @@ You need **two API keys** to run this project:
 <img src="https://github.com/user-attachments/assets/7ac5ff5a-25e3-498a-9863-7663508fcffe" width="300" alt="Meta Description Suggestion">
 
 ---
----
-👤 Author
-Debarghya Kundu
-📫 LinkedIn
-📧 Email: debarghyakundu319@gmail.com
----
-💡 Future Improvements
-Add support for multiple languages
 
-Export enhanced text to PDF/Word
+## Author
 
-Integrate real-time keyword trends (Google Trends API)
+👤 **Debarghya Kundu**  
+📫 **LinkedIn:** [https://www.linkedin.com/in/debarghyakundu/](https://www.linkedin.com/in/debarghyakundu/)  
+📧 **Email:** debarghyakundu319@gmail.com
+
+---
+
+## 💡 Future Improvements
+
+- Add support for multiple languages
+- Export enhanced text to PDF/Word
+- Integrate real-time keyword trends (Google Trends API)
