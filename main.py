@@ -98,7 +98,7 @@ def insert_keywords(text, keywords):
         + f" including {keywords_phrase}"
         + text[insertion_point:]
     )
-    return new_text, True, to_add
+    return new_text, inserted_bool, inserted_keywords_list
 
     
 def highlight_inserted_keywords(text, keywords):
@@ -314,6 +314,10 @@ if analyze_button:
 
         # Insert recommended keywords into original text
         updated_text, inserted, inserted_keywords = insert_keywords(user_text, recommended)
+        
+        # Then later
+        highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
+        st.markdown(f'<div style="{container_style}">{highlighted_text}</div>', unsafe_allow_html=True)
         st.markdown("### 🔄 Before vs After: Text Comparison")
         before_col, after_col = st.columns(2)
         container_style = """
