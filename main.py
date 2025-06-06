@@ -228,35 +228,39 @@ if analyze_button:
         col1, col2 = st.columns([2, 3])
 
         with col1:
-            st.markdown("### 🏷️ Entities by Relevance")
-            if analysis["entities"]:
-                entities_df = pd.DataFrame([
-                    {"Entity": e["id"], "Relevance": e["relevance"]}
-                    for e in analysis["entities"]
-                ])
-                chart = alt.Chart(entities_df).mark_bar(color="#764ba2").encode(
-                    x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Entity:N', sort='-x'),
-                    tooltip=['Entity', 'Relevance']
-                ).properties(height=300)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No entities detected.")
+            ent_col, top_col = st.columns(2)  # Split inside col1
 
-            st.markdown("### 🎯 Topics by Score")
-            if analysis["topics"]:
-                topics_df = pd.DataFrame([
-                    {"Topic": t["label"], "Score": t["score"]}
-                    for t in analysis["topics"]
-                ])
-                chart = alt.Chart(topics_df).mark_bar(color="#ff7e5f").encode(
-                    x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
-                    y=alt.Y('Topic:N', sort='-x'),
-                    tooltip=['Topic', 'Score']
-                ).properties(height=260)
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.info("No topics detected.")
+            with ent_col:
+                st.markdown("### 🏷️ Entities by Relevance")
+                if analysis["entities"]:
+                    entities_df = pd.DataFrame([
+                        {"Entity": e["id"], "Relevance": e["relevance"]}
+                        for e in analysis["entities"]
+                    ])
+                    chart = alt.Chart(entities_df).mark_bar(color="#764ba2").encode(
+                        x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
+                        y=alt.Y('Entity:N', sort='-x'),
+                        tooltip=['Entity', 'Relevance']
+                    ).properties(height=300)
+                    st.altair_chart(chart, use_container_width=True)
+                else:
+                    st.info("No entities detected.")
+        
+            with top_col:
+                st.markdown("### 🎯 Topics by Score")
+                if analysis["topics"]:
+                    topics_df = pd.DataFrame([
+                        {"Topic": t["label"], "Score": t["score"]}
+                        for t in analysis["topics"]
+                    ])
+                    chart = alt.Chart(topics_df).mark_bar(color="#ff7e5f").encode(
+                        x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
+                        y=alt.Y('Topic:N', sort='-x'),
+                        tooltip=['Topic', 'Score']
+                    ).properties(height=300)
+                    st.altair_chart(chart, use_container_width=True)
+                else:
+                    st.info("No topics detected.")
 
         with col2:
             st.markdown("### 🗂️ Categories by Score")
