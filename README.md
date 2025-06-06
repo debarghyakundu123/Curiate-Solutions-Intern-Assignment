@@ -30,16 +30,13 @@
 
 
 
-🔗 LinkedIn Integration
+### 🔑 API Keys Setup
 
-🌈 Beautiful, responsive UI with badges, charts, and custom styling
+You need **two API keys** to run this project:
 
-🔑 API Keys Setup
-You need two keys:
+- **TextRazor:** Get your free API key [here](https://www.textrazor.com/signup).
+- **Groq API:** Sign up and get access [here](https://www.groq.com/signup).
 
-TextRazor: Get it here
-
-Groq API: Sign up here.
 
 🖼️ App Screenshots
 <!-- Add screenshot in repo -->
