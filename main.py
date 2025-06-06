@@ -86,7 +86,7 @@ def insert_keywords(text, keywords):
     to_add = [kw for kw in keywords if kw.lower() not in present]
 
     if not to_add:
-        return text, False
+        return text, False, []
 
     insertion_point = text.rfind(".")
     if insertion_point == -1:
@@ -98,7 +98,8 @@ def insert_keywords(text, keywords):
         + f" including {keywords_phrase}"
         + text[insertion_point:]
     )
-    return new_text, True
+    return new_text, True, to_add
+
     
 def highlight_inserted_keywords(text, keywords):
     def replacer(match):
@@ -312,7 +313,7 @@ if analyze_button:
             st.info("No recommended keywords found based on threshold.")
 
         # Insert recommended keywords into original text
-        updated_text, inserted = insert_keywords(user_text, recommended)
+        updated_text, inserted, inserted_keywords = insert_keywords(user_text, recommended)
         st.markdown("### 🔄 Before vs After: Text Comparison")
         before_col, after_col = st.columns(2)
         container_style = """
