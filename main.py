@@ -165,6 +165,27 @@ if st.button("🔗 Visit My LinkedIn Profile"):
     webbrowser.open_new_tab(linkedin_url)
 st.markdown(
     """
+    <a href="https://www.linkedin.com/in/debarghyakundu/" target="_blank">
+        <button style="
+            background-color: #0e76a8;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        ">
+            🔗 Visit My LinkedIn Profile
+        </button>
+    </a>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
     <style>
     /* Gradient background for header */
     .stApp {
