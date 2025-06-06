@@ -28,7 +28,7 @@
 - Generates SEO-optimized **meta descriptions**.
 - Tailored to your content and keywords.
 
-
+---
 
 ### 🔑 API Keys Setup
 
