@@ -1,4 +1,4 @@
-🔥 SEO Analyzer & AI Enhancer
+<h1 align="center"><strong>🔥 SEO Analyzer & AI Enhancer</strong></h1>
 
 🚀 Features
 🔍 SEO Keyword Extraction
