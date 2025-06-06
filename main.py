@@ -9,22 +9,6 @@ import altair as alt
 from groq import Groq
 import webbrowser
 
-# --- Title ---
-st.title("Welcome to the SEO Analyzer & AI Enhancer 🧠📈")
-
-# --- Subtitle or Welcome Message ---
-st.markdown("### 🚀 Supercharge Your Content with AI and SEO Insights")
-
-# --- LinkedIn Button Section ---
-st.markdown("### 🔗 Connect with Me")
-
-# Replace this with your actual LinkedIn ID
-linkedin_id = "debarghyakundu319"  # Just your ID, not full URL
-linkedin_url = f"https://www.linkedin.com/in/{linkedin_id}"
-
-if st.button("🔗 Visit My LinkedIn"):
-    webbrowser.open_new_tab(linkedin_url)
-
 # --- Setup ---
 
 textrazor.api_key = "9a59e0c22ec2d995fa459cf0d61ebe07580bfaa426d1cf6dee35959e"
@@ -171,7 +155,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     page_icon="🚀"
 )
+# Paste LinkedIn section below this:
+st.title("Welcome to the SEO Analyzer & AI Enhancer 🧠📈")
+st.markdown("### 🚀 Supercharge Your Content with AI and SEO Insights")
 
+linkedin_url = "https://www.linkedin.com/in/debarghyakundu/"
+
+if st.button("🔗 Visit My LinkedIn Profile"):
+    webbrowser.open_new_tab(linkedin_url)
 st.markdown(
     """
     <style>
