@@ -225,12 +225,11 @@ if analyze_button:
         st.markdown("---")
 
         # Columns for charts + info
-        col1, col2 = st.columns([2, 3])
 
         with col1:
-            ent_col, spacer_col, top_col = st.columns([5, 0.2, 5])  # Spacer is narrow
+            left_col, spacer_col, right_col = st.columns([3, 6, 3])  # Left and Right narrow, middle wide spacer
         
-            with ent_col:
+            with left_col:
                 st.markdown("### 🏷️ Entities by Relevance")
                 if analysis["entities"]:
                     entities_df = pd.DataFrame([
@@ -241,14 +240,14 @@ if analyze_button:
                         x=alt.X('Relevance:Q', scale=alt.Scale(domain=[0, 1])),
                         y=alt.Y('Entity:N', sort='-x'),
                         tooltip=['Entity', 'Relevance']
-                    ).properties(height=300)
+                    ).properties(height=400)  # Bigger height for bigger display
                     st.altair_chart(chart, use_container_width=True)
                 else:
                     st.info("No entities detected.")
         
-            # spacer_col is left empty to create space
+            # Spacer column just empty for big space
         
-            with top_col:
+            with right_col:
                 st.markdown("### 🎯 Topics by Score")
                 if analysis["topics"]:
                     topics_df = pd.DataFrame([
@@ -259,11 +258,10 @@ if analyze_button:
                         x=alt.X('Score:Q', scale=alt.Scale(domain=[0, 1])),
                         y=alt.Y('Topic:N', sort='-x'),
                         tooltip=['Topic', 'Score']
-                    ).properties(height=300)
+                    ).properties(height=400)  # Bigger height for bigger display
                     st.altair_chart(chart, use_container_width=True)
                 else:
                     st.info("No topics detected.")
-
 
 
         # SEO Keywords table + badges
