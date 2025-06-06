@@ -229,8 +229,9 @@ if analyze_button:
 
         with col1:
             left_col, spacer_col, right_col = st.columns([3, 6, 3])  # Left and Right narrow, middle wide spacer
-        
-           with left_col:
+            
+            with left_col:
+                
                 st.markdown("### 🏷️ Entities by Relevance")
                 st.markdown("<p style='color:#555; font-size:14px;'>Shows key entities found in your text, ranked by relevance score (0 to 1).</p>", unsafe_allow_html=True)
             
@@ -251,7 +252,7 @@ if analyze_button:
                 else:
                     st.info("No entities detected.")
 
-        
+            
             # Spacer column just empty for big space
         
             with right_col:
