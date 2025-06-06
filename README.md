@@ -1,17 +1,25 @@
 <h1 align="center"><strong>🔥 SEO Analyzer & AI Enhancer</strong></h1>
 
-🚀 Features
-🔍 SEO Keyword Extraction
+### 🚀 Features of the SEO Analyzer & AI Enhancer
 
-🧠 AI-based Enhancement Suggestions (using LLaMA 3 via Groq)
+#### 🔍 SEO Keyword Extraction  
+Extract high-relevance keywords using advanced NLP techniques via the TextRazor API.
 
-📝 Spelling Correction
+#### 🧠 AI-based Enhancement Suggestions  
+Leverage **LLaMA 3** through the **Groq API** to provide intelligent, positive-only content enhancement recommendations.
 
-📊 Entities & Topic Charts (Altair)
+#### 📝 Spelling Correction  
+Automatically identify and suggest corrections for spelling mistakes in your content.
 
-✨ Smart Keyword Insertion
+#### 📊 Entities & Topic Charts  
+Visualize extracted **Entities** and **Topics** using elegant, interactive **Altair bar charts** for better insights.
 
-💡 Meta Description Generator
+#### ✨ Smart Keyword Insertion  
+Enhance your text by intelligently inserting missing high-relevance keywords without disrupting the flow.
+
+#### 💡 Meta Description Generator  
+AI-powered generation of a compelling **meta description** based on your content and extracted keywords.
+
 
 🔗 LinkedIn Integration
 
