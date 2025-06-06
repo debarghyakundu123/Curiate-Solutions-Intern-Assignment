@@ -146,10 +146,10 @@ def grouped_bar_chart(df, title, item_col='Item'):
 # --- Streamlit App ---
 
 st.set_page_config(
-    page_title="🔥 SEO Analyzer & AI Enhancer 🔥",
+    page_title="ðŸ”¥ SEO Analyzer & AI Enhancer ðŸ”¥",
     layout="wide",
     initial_sidebar_state="expanded",
-    page_icon="🚀"
+    page_icon="ðŸš€"
 )
 
 st.markdown(
@@ -241,18 +241,18 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="header">🔥 SEO Text Analyzer & AI Enhancer 🔥</div>', unsafe_allow_html=True)
-st.markdown('<div class="subheader">Paste your text and unlock powerful SEO insights with AI magic! ✨</div>', unsafe_allow_html=True)
+st.markdown('<div class="header">ðŸ”¥ SEO Text Analyzer & AI Enhancer ðŸ”¥</div>', unsafe_allow_html=True)
+st.markdown('<div class="subheader">Paste your text and unlock powerful SEO insights with AI magic! âœ¨</div>', unsafe_allow_html=True)
 
-user_text = st.text_area("🚀 Enter your text here:", height=220, placeholder="Paste your SEO content or article here...")
+user_text = st.text_area("ðŸš€ Enter your text here:", height=220, placeholder="Paste your SEO content or article here...")
 
-analyze_button = st.button("✨ Analyze & Enhance ✨", help="Click to analyze and get AI suggestions", key="analyze")
+analyze_button = st.button("âœ¨ Analyze & Enhance âœ¨", help="Click to analyze and get AI suggestions", key="analyze")
 
 if analyze_button:
     if not user_text.strip():
-        st.warning("⚠️ Please enter some text before analyzing!")
+        st.warning("âš ï¸ Please enter some text before analyzing!")
     else:
-        with st.spinner("🛠️ Running analysis, hang tight..."):
+        with st.spinner("ðŸ› ï¸ Running analysis, hang tight..."):
             # Analyze original
             original_analysis = analyze_text(user_text)
             # Get recommended keywords
@@ -265,11 +265,11 @@ if analyze_button:
 
                 # --- BEFORE vs AFTER SEO COMPARISON SECTION ---
         st.markdown("---")
-        st.markdown("## 🚦 Before vs After SEO Comparison")
+        st.markdown("## ðŸš¦ Before vs After SEO Comparison")
         
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("### 📝 Original Text")
+            st.markdown("### ðŸ“ Original Text")
             st.markdown(f'<div class="card">{user_text}</div>', unsafe_allow_html=True)
             st.markdown("#### Entities")
             ent_before = [e['id'] for e in original_analysis['entities']]
@@ -285,7 +285,7 @@ if analyze_button:
             st.write(kw_before if kw_before else "None detected")
         
         with col2:
-            st.markdown("### 📝 Enhanced Text")
+            st.markdown("### ðŸ“ Enhanced Text")
             st.markdown(f'<div class="card">{updated_text}</div>', unsafe_allow_html=True)
             st.markdown("#### Entities")
             ent_after = [e['id'] for e in enhanced_analysis['entities']]
@@ -301,7 +301,7 @@ if analyze_button:
             st.write(kw_after if kw_after else "None detected")
         
         # Show a summary table for quick comparison
-        st.markdown("### 📋 Quick Comparison Table")
+        st.markdown("### ðŸ“‹ Quick Comparison Table")
         comp_data = {
             "Original": [
                 len(ent_before), len(top_before), len(cat_before), len(kw_before)
@@ -314,7 +314,7 @@ if analyze_button:
         st.table(comp_df)
         
         # Show Altair bar charts for visual diff (Entities as example)
-        st.markdown("### 📊 Entities Relevance: Before vs After")
+        st.markdown("### ðŸ“Š Entities Relevance: Before vs After")
         entities_df = compare_items(
             original_analysis["entities"],
             enhanced_analysis["entities"],
@@ -333,10 +333,10 @@ if analyze_button:
     
 
         st.markdown("---")
-        st.markdown("## 📊 SEO Comparison: Original vs Enhanced")
+        st.markdown("## ðŸ“Š SEO Comparison: Original vs Enhanced")
 
         # --- Entities Comparison ---
-        st.markdown("### 🏷️ Entities Relevance Comparison")
+        st.markdown("### ðŸ·ï¸ Entities Relevance Comparison")
         entities_df = compare_items(
             original_analysis["entities"],
             enhanced_analysis["entities"],
@@ -348,7 +348,7 @@ if analyze_button:
         st.dataframe(entities_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
         # --- Topics Comparison ---
-        st.markdown("### 🎯 Topics Score Comparison")
+        st.markdown("### ðŸŽ¯ Topics Score Comparison")
         topics_df = compare_items(
             original_analysis["topics"],
             enhanced_analysis["topics"],
@@ -360,7 +360,7 @@ if analyze_button:
         st.dataframe(topics_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
         # --- Categories Comparison ---
-        st.markdown("### 🗂️ Categories Score Comparison")
+        st.markdown("### ðŸ—‚ï¸ Categories Score Comparison")
         categories_df = compare_items(
             original_analysis["categories"],
             enhanced_analysis["categories"],
@@ -372,7 +372,7 @@ if analyze_button:
         st.dataframe(categories_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
         # --- SEO Keywords Comparison ---
-        st.markdown("### 🔑 SEO Keywords Relevance Comparison")
+        st.markdown("### ðŸ”‘ SEO Keywords Relevance Comparison")
         keywords_df = compare_items(
             original_analysis["seo_keywords"],
             enhanced_analysis["seo_keywords"],
@@ -384,7 +384,7 @@ if analyze_button:
         st.dataframe(keywords_df.sort_values("Enhanced Score", ascending=False), use_container_width=True)
 
         # --- Keyword Presence & Highlights ---
-        st.markdown("### 💡 Keyword Presence & Highlights")
+        st.markdown("### ðŸ’¡ Keyword Presence & Highlights")
         present_before = [kw for kw in recommended if re.search(r'\b' + re.escape(kw.lower()) + r'\b', user_text.lower())]
         present_after = [kw for kw in recommended if re.search(r'\b' + re.escape(kw.lower()) + r'\b', updated_text.lower())]
         added = [kw for kw in present_after if kw not in present_before]
@@ -394,13 +394,13 @@ if analyze_button:
         st.write(f"**New keywords added:** {', '.join(added) if added else 'None'}")
 
         if added:
-            st.markdown("#### 🔍 New Keyword Insertion Snippets")
+            st.markdown("#### ðŸ” New Keyword Insertion Snippets")
             snippets = get_keyword_snippets(updated_text, added)
             for snippet in snippets:
-                st.markdown(f'<div class="highlight-snippet">…{snippet}…</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="highlight-snippet">â€¦{snippet}â€¦</div>', unsafe_allow_html=True)
 
         # --- Analytics Insights ---
-        st.markdown("### 📈 Analytics Insights")
+        st.markdown("### ðŸ“ˆ Analytics Insights")
 
         def avg_score(df, col):
             if df.empty: return 0
@@ -412,40 +412,40 @@ if analyze_button:
         enh_entities = len(enhanced_analysis["entities"])
         avg_ent_orig = avg_score(entities_df, "Original Score")
         avg_ent_enh = avg_score(entities_df, "Enhanced Score")
-        insights.append(f"**Entities:** {orig_entities} → {enh_entities} (avg relevance {avg_ent_orig:.2f} → {avg_ent_enh:.2f})")
+        insights.append(f"**Entities:** {orig_entities} â†’ {enh_entities} (avg relevance {avg_ent_orig:.2f} â†’ {avg_ent_enh:.2f})")
         # Topics
         orig_topics = len(original_analysis["topics"])
         enh_topics = len(enhanced_analysis["topics"])
         avg_top_orig = avg_score(topics_df, "Original Score")
         avg_top_enh = avg_score(topics_df, "Enhanced Score")
-        insights.append(f"**Topics:** {orig_topics} → {enh_topics} (avg score {avg_top_orig:.2f} → {avg_top_enh:.2f})")
+        insights.append(f"**Topics:** {orig_topics} â†’ {enh_topics} (avg score {avg_top_orig:.2f} â†’ {avg_top_enh:.2f})")
         # Categories
         orig_cats = len(original_analysis["categories"])
         enh_cats = len(enhanced_analysis["categories"])
         avg_cat_orig = avg_score(categories_df, "Original Score")
         avg_cat_enh = avg_score(categories_df, "Enhanced Score")
-        insights.append(f"**Categories:** {orig_cats} → {enh_cats} (avg score {avg_cat_orig:.2f} → {avg_cat_enh:.2f})")
+        insights.append(f"**Categories:** {orig_cats} â†’ {enh_cats} (avg score {avg_cat_orig:.2f} â†’ {avg_cat_enh:.2f})")
         # Keywords
         orig_kw = len(original_analysis["seo_keywords"])
         enh_kw = len(enhanced_analysis["seo_keywords"])
         avg_kw_orig = avg_score(keywords_df, "Original Score")
         avg_kw_enh = avg_score(keywords_df, "Enhanced Score")
-        insights.append(f"**SEO Keywords:** {orig_kw} → {enh_kw} (avg relevance {avg_kw_orig:.2f} → {avg_kw_enh:.2f})")
+        insights.append(f"**SEO Keywords:** {orig_kw} â†’ {enh_kw} (avg relevance {avg_kw_orig:.2f} â†’ {avg_kw_enh:.2f})")
 
         st.markdown("\n".join(insights))
 
         # --- Spelling Suggestions ---
         if original_analysis["spelling_suggestions"] or enhanced_analysis["spelling_suggestions"]:
-            with st.expander("📝 Spelling Suggestions (Click to expand)"):
+            with st.expander("ðŸ“ Spelling Suggestions (Click to expand)"):
                 st.write("**Original Text:**")
                 for sug in original_analysis["spelling_suggestions"]:
-                    st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
+                    st.write(f"**{sug['token']}** âž¡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
                 st.write("**Enhanced Text:**")
                 for sug in enhanced_analysis["spelling_suggestions"]:
-                    st.write(f"**{sug['token']}** ➡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
+                    st.write(f"**{sug['token']}** âž¡ Suggestions: {', '.join(map(str, sug['suggestions']))}")
 
         # --- Show Original vs Enhanced Text ---
-        st.markdown("### 📝 Original vs Enhanced Text")
+        st.markdown("### ðŸ“ Original vs Enhanced Text")
         col_a, col_b = st.columns(2)
         with col_a:
             st.markdown("#### Original Text")
@@ -460,7 +460,7 @@ if analyze_button:
 
         # --- AI Positive Summary via Groq ---
         st.markdown("---")
-        st.markdown("### 🤖 AI SEO Improvement Summary")
+        st.markdown("### ðŸ¤– AI SEO Improvement Summary")
 
         groq_prompt = (
             "Compare the following two texts for SEO optimization. "
@@ -474,7 +474,7 @@ if analyze_button:
             f"{updated_text}\n\n"
             f"Recommended Keywords: {', '.join(recommended)}"
         )
-        with st.spinner("Generating AI summary... 🌟"):
+        with st.spinner("Generating AI summary... ðŸŒŸ"):
             groq_response = groq_ai_request(groq_prompt)
 
         st.text_area(
@@ -506,5 +506,5 @@ if analyze_button:
             transform: scale(1.05);
         }
         </style>
-        <button class="copy-button" onclick="navigator.clipboard.writeText(document.querySelector('textarea').value)">📋 Copy AI Summary</button>
+        <button class="copy-button" onclick="navigator.clipboard.writeText(document.querySelector('textarea').value)">ðŸ“‹ Copy AI Summary</button>
         """, unsafe_allow_html=True)
