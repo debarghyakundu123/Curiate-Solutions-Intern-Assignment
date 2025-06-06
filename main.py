@@ -312,7 +312,16 @@ if analyze_button:
 
         # Insert recommended keywords into original text
         updated_text, inserted = insert_keywords(user_text, recommended)
+        st.markdown("### 🔄 Before vs After: Text Comparison")
+        before_col, after_col = st.columns(2)
+        with before_col:
+            st.markdown("**📝 Original Text**")
+            st.code(user_text, language="markdown")
+        with after_col:
+            st.markdown("**✅ Enhanced Text with Keywords**")
+            st.code(updated_text, language="markdown")
 
+        
         # Show text after keyword insertion in a card
         st.markdown("### ✍️ Text with Inserted Keywords")
         if inserted:
