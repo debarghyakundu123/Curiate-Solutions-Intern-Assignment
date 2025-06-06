@@ -86,7 +86,7 @@ def insert_keywords(text, keywords):
     to_add = [kw for kw in keywords if kw.lower() not in present]
 
     if not to_add:
-        return text, False, []
+        return text, False
 
     insertion_point = text.rfind(".")
     if insertion_point == -1:
@@ -98,18 +98,8 @@ def insert_keywords(text, keywords):
         + f" including {keywords_phrase}"
         + text[insertion_point:]
     )
-    return new_text, inserted_bool, inserted_keywords_list
+    return new_text, True
 
-    
-def highlight_inserted_keywords(text, keywords):
-    def replacer(match):
-        return f'<mark style="background-color: #fff59d;">{match.group(0)}</mark>'
-    for kw in keywords:
-        # Use regex with word boundaries, ignore case
-        pattern = re.compile(r'\b' + re.escape(kw) + r'\b', re.IGNORECASE)
-        text = pattern.sub(replacer, text)
-    return text
-    
 def get_keyword_snippets(text, keywords, window=30):
     text_lower = text.lower()
     snippets = []
@@ -313,33 +303,15 @@ if analyze_button:
             st.info("No recommended keywords found based on threshold.")
 
         # Insert recommended keywords into original text
-        updated_text, inserted, inserted_keywords = insert_keywords(user_text, recommended)
-        
-        # Then later
-        highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
-        st.markdown(f'<div style="{container_style}">{highlighted_text}</div>', unsafe_allow_html=True)
+        updated_text, inserted = insert_keywords(user_text, recommended)
         st.markdown("### 🔄 Before vs After: Text Comparison")
         before_col, after_col = st.columns(2)
-        container_style = """
-    max-height: 350px;
-    overflow-y: auto;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
-    white-space: pre-wrap;
-    font-family: monospace;
-    font-size: 14px; """
         with before_col:
             st.markdown("**📝 Original Text**")
-            # Display original text inside scrollable div
-            st.markdown(f'<div style="{container_style}">{user_text}</div>', unsafe_allow_html=True)
-
+            st.code(user_text, language="markdown")
         with after_col:
             st.markdown("**✅ Enhanced Text with Keywords**")
-            # Highlight inserted keywords with <mark> and display inside scrollable div
-            highlighted_text = highlight_inserted_keywords(updated_text, inserted_keywords)
-            st.markdown(f'<div style="{container_style}">{highlighted_text}</div>', unsafe_allow_html=True)
+            st.code(updated_text, language="markdown")
 
         
         # Show text after keyword insertion in a card
