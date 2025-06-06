@@ -228,8 +228,8 @@ if analyze_button:
         col1, col2 = st.columns([2, 3])
 
         with col1:
-            ent_col, top_col = st.columns(2)  # Split inside col1
-
+            ent_col, spacer_col, top_col = st.columns([5, 0.2, 5])  # Spacer is narrow
+        
             with ent_col:
                 st.markdown("### 🏷️ Entities by Relevance")
                 if analysis["entities"]:
@@ -245,6 +245,8 @@ if analyze_button:
                     st.altair_chart(chart, use_container_width=True)
                 else:
                     st.info("No entities detected.")
+        
+            # spacer_col is left empty to create space
         
             with top_col:
                 st.markdown("### 🎯 Topics by Score")
