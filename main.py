@@ -11,7 +11,7 @@ import webbrowser
 
 # --- Setup ---
 
-textrazor.api_key = "9a59e0c22ec2d995fa459cf0d61ebe07580bfaa426d1cf6dee35959e"
+textrazor.api_key = st.secrets["textrazor_api_key"]
 client = textrazor.TextRazor(extractors=[
     "entities",
     "topics",
@@ -26,8 +26,7 @@ client = textrazor.TextRazor(extractors=[
     "translation"
 ])
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or "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"
-groq_client = Groq(api_key=GROQ_API_KEY)
+groq_client = Groq(api_key=st.secrets["groq_api_key"])
 
 # --- Helper Functions ---
 
